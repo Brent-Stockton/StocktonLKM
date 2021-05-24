@@ -1,0 +1,93 @@
+
+/* 
+ * File:   StocktonLKM.c
+ * Author: brentstockton
+ *  LKM for the Linux kernel that displays the following details for all the processes whose PID is greater than an integer given by the user as a module parameter: 
+ *
+ * Created on March 29, 2021, 3:51 PM
+ *version 1.5
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <linux/kernel.h>
+#include <linux/sched.h>
+#include <linux/module.h>
+#include <linux/proc_fs.h>
+
+//buffer
+char buffer[256];
+
+//gets tasks state
+char *get_task_state(long state)
+{
+  switch (state)
+  {
+  case TASK_RUNNING;
+      return "Tasks Running";
+      case TASK_INTERRUPTABLE;
+      return "Tasks Interrupted";
+      case TASK_UNINTERUPTABLE;
+      return "Tasks Uninterupted";
+      case TASK_STOPPED;
+      return "Tasks Stopped";
+      case TASK_TRACED;
+      return "Tasks Traced";
+      default:
+  {
+    sprintf(buffer, "Unknown Type:%ld\n");
+    return buffer;
+  }
+  }
+}
+
+//Method to display pids greater than user input
+static int display_tasks(int userpid)
+{
+
+  //task struct
+  stuct task_struct *task;
+  pr_info("%s: In init\n", _func_);
+
+  for_each_process(task)
+  {
+
+    //if task PID is > then user input PID
+    if ((int)task->pid > userpid)
+    {
+
+      pr_info("Process:%s\t", task->comm);
+      printk("Process: %s\n", task->comm);
+      pr_info("PID Number: %ld\t", (long)task->pid);
+      printk("PID Number: %ld\n", (long)task->pid);
+      pr_info("Process State: %ld\t", (long)task->state);
+      printk("Process State: %ld\n", (long)task->state);
+      pr_info("Priority: %ld\t", (long)task->prio);
+      printk("Priority: %ld\n", (long)task->prio);
+      pr_info("RT_Priority: %ld\t", (long)task->rt_priority);
+      printk("RT_Priority: %ld\n", (long)task->rt_priority);
+      pr_info("Static Priority: %ld\t", (long)task->static_prio);
+      printk("Static Priority: %ld\n", (long)task->static_prio);
+      pr_info("Normal Priority: %ld\t", (long)task->normal_prio);
+      printk("Normal Priority: %ld\n", (long)task->normal_prio);
+      get_task_state(task->state);
+
+      return 0;
+    }
+
+    static void test_tasks_exit(void)
+    {
+      {
+
+        printf("Please enter an PID integer value.");
+        scanf("%d", &userpid);
+
+        display_tasks(int userpid);
+        pr_info("%s: In exit n", _func_);
+      }
+
+      MODULE_LICENSE("GPL");
+      module_inut(test_tasks_init);
+      module_exit(test_tasks_exit);
